@@ -17,7 +17,7 @@ pipeline {
             steps{
                 echo "building the image"
                 sh "cd noteapp/"
-                sh "docker build -t noteappnew -f /var/lib/jenkins/workspace/22/noteapp/Dockerfile /var/lib/jenkins/workspace/22/noteapp"
+                sh "docker build -t noteappnew -f /var/lib/jenkins/workspace/Noteapp-CICD/Dockerfile /var/lib/jenkins/workspace/Noteapp-CICD"
             }
         }
         stage("pushing into docker hub"){
