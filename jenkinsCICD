@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+
+    environment {
+        GITHUB_TOKEN = credentials('Github_credentials_ID')
+    }
+
+    stages {
+        stage('Clone Private Repo') {
+            steps {
+                script {
+                    sh "git clone https://hamna_cloudscoot:${GITHUB_TOKEN}@github.com/hamna-Cloudscoot/noteapp.git"
+                }
+            }
+        }
+        stage("build") {
+            steps{
+                echo "building the image"
+                sh "cd noteapp/"
+                sh "docker build -t noteappnew -f /var/lib/jenkins/workspace/Noteapp-CICD/Dockerfile /var/lib/jenkins/workspace/Noteapp-CICD"
+            }
+        }
+        stage("pushing into docker hub"){
+            steps{
+                echo "pushing the image into docker hub"
+                withCredentials([usernamePassword(credentialsId:"DockerHub", passwordVariable:"DockerHubpass",usernameVariable:"DockerHubUser")]){
+                sh "docker tag noteappnew $DockerHubUser/noteappnew:latest"
+                sh "docker login -u $DockerHubUser -p $DockerHubpass"
+                sh "docker push $DockerHubUser/noteappnew:latest"
+                }
+            }
+        }
+        stage("deploy") {
+            steps{
+                echo "deploying the image"
+                sh "docker run -d --name noteappcontainernew -p 8000:8000 noteappnew"
+            }
+        }
+    }
+}
