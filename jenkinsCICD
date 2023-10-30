@@ -7,12 +7,25 @@ pipeline {
 
     stages {
         stage('Clone Private Repo') {
-            steps {
-                script {
-                    sh "git clone https://hamna_cloudscoot:${GITHUB_TOKEN}@github.com/hamna-Cloudscoot/noteapp.git"
+    steps {
+        script {
+            // Define the repository URL and directory path
+            def repoUrl = "https://hamna_cloudscoot:${GITHUB_TOKEN}@github.com/hamna-Cloudscoot/noteapp.git"
+            def repoDir = "noteapp"
+
+            // Check if the repository directory exists
+            if (!fileExists(repoDir)) {
+                // If it doesn't exist, clone the repository
+                sh "git clone $repoUrl $repoDir"
+            } else {
+                // If it exists, update the existing clone
+                dir(repoDir) {
+                    sh "git pull"
                 }
             }
         }
+    }
+}
         stage("build") {
             steps{
                 echo "building the image"
